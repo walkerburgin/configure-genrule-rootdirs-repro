@@ -1,0 +1,43 @@
+load("@aspect_rules_js//js:defs.bzl", "js_library")
+load("@aspect_rules_ts//ts:defs.bzl", "ts_config", "ts_project")
+load("@npm//:defs.bzl", "npm_link_all_packages")
+
+genrule(
+    name = "codegen",
+    outs = [
+        "dist/r1.d.ts",
+        "dist/r1.js",
+    ],
+    cmd = "\n".join([
+        "echo 'export const r1: number;' > $(location dist/r1.d.ts)",
+        "echo 'export const r1 = 1;' > $(location dist/r1.js)",
+    ]),
+)
+
+npm_link_all_packages(name = "node_modules")
+
+ts_project(
+    name = "typescript",
+    srcs = [
+        "src/index.ts",
+    ],
+    declaration = True,
+    out_dir = "dist",
+    preserve_jsx = False,
+    root_dir = "src",
+    transpiler = "tsc",
+    tsconfig = ":tsconfig",
+    deps = [],
+)
+
+js_library(
+    name = "pkg",
+    srcs = ["package.json"],
+    visibility = ["//visibility:public"],
+    deps = [":typescript"],
+)
+
+ts_config(
+    name = "tsconfig",
+    src = "tsconfig.json",
+)

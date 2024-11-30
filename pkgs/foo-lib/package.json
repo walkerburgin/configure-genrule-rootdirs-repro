@@ -1,0 +1,6 @@
+{
+  "name": "@monorepo/test",
+  "exports": {
+    ".": "./dist/index.js"
+  }
+}
